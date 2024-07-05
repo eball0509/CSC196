@@ -1,58 +1,81 @@
-using namespace std;
+#include "Renderer.h"
+#include "Vector2.h"
+#include "Input.h"
+#include "ETime.h"
+#include "Random.h"
+#include "Particles.h"
+
+#include <cstdlib>
 #include <iostream>
-#include "test.h"
 #include <SDL.h>
-#include <random>
+#include <vector>
+using namespace std;
 
 int main(int argc, char* argv[]) {
-	cout << "hello World" << endl;
-	print();
-	// initialize SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	
+	Renderer renderer;
+	renderer.Initialize();
+	renderer.CreateWindow("Game Window", 800, 600);
+
+	Input input;
+	input.Initialize();
+
+	//Time time;
+
+	vector<Particle> particles;
+
+
+	bool quit = false;
+	vector<Vector2> points;
+	while (!quit)
 	{
-		std::cerr << "Error initializing SDL: " << SDL_GetError() << std::endl;
-		return 1;
-	}
-
-	// create window
-	// returns pointer to window if successful or nullptr if failed
-	SDL_Window* window = SDL_CreateWindow("Game Engine",
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		800, 600,
-		SDL_WINDOW_SHOWN);
-	if (window == nullptr)
-	{
-		std::cerr << "Error creating SDL window: " << SDL_GetError() << std::endl;
-		SDL_Quit();
-		return 1;
-	}
-
-	// create renderer
-	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
-
-	while (true)
-	{
-		// clear screen
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-		SDL_RenderClear(renderer);
-
-		// draw line
-		int value = rand() % 1000;
-
-		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
-		SDL_RenderDrawLine(renderer, 300, 300, 400, 200);
-
-		for (int i = 0; i < 100; i++)
-		{
-			SDL_SetRenderDrawColor(renderer, rand() % 255, rand() % 255, rand() % 255, 0);
-			SDL_RenderDrawLine(renderer, rand() % 800, rand() % 600, 800, 600);
-			SDL_RenderDrawPoint(renderer, rand() % 800, rand() % 600);
-
+		//time.Tick();
+		
+	
+		input.Update();
+		if (input.GetKeyDown(SDL_SCANCODE_ESCAPE)) {
+			quit = true;
 		}
-		// show screen
-		SDL_RenderPresent(renderer);
+
+		Vector2 mousePosition = input.GetMousePosition();
+		if (input.getMouseButtonDown(0)) 
+		{
+			for (int i = 0; i < 100; i++) 
+			{
+				//particles.push_back(Particle{ mousePosition, { randomf(-300, 300), randomf(-300, 300)} });
+			}
+		}
+
+		
+
+		
+		if (input.getMouseButtonDown(0) && !input.getPreviousMouseButtonDown(0)) {
+			cout << "Mouse Pressed\n";
+			points.push_back(mousePosition);
+		}
+
+		
+		if (input.getMouseButtonDown(0) && input.getMouseButtonDown(0)) {
+			cout << "Mouse Held\n";
+			float distance = (points.back() - mousePosition).Length();
+			if (distance > 3) {
+				points.push_back(mousePosition);
+			}
+		}
+
+		
+
+		renderer.SetColor(0, 0, 0, 0);
+		renderer.BeginFrame();
+
+		for (int i = 0; points.size() > 1 && i < points.size() - 1; i++) {
+			renderer.SetColor(255, 255, 255, 0);
+			renderer.Drawpoint(points[i].x, points[i].y);
+			renderer.DrawLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+		}
+		
+		renderer.EndFrame();
+
 	}
-
 	return 0;
-
 }

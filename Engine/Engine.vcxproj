@@ -19,10 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\test.cpp" />
+    <ClCompile Include="Source\ETime.cpp" />
+    <ClCompile Include="Source\Input.cpp" />
+    <ClCompile Include="Source\Particles.cpp" />
+    <ClCompile Include="Source\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\test.h" />
+    <ClInclude Include="Source\ETime.h" />
+    <ClInclude Include="Source\Input.h" />
+    <ClInclude Include="Source\Particles.h" />
+    <ClInclude Include="Source\Random.h" />
+    <ClInclude Include="Source\Renderer.h" />
+    <ClInclude Include="Source\Vector2.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
