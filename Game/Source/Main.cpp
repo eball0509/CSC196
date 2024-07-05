@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	Input input;
 	input.Initialize();
 
-	//Time time;
+	Time time;
 
 	vector<Particle> particles;
 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 	vector<Vector2> points;
 	while (!quit)
 	{
-		//time.Tick();
+		time.Tick();
 		
 	
 		input.Update();
@@ -42,11 +42,17 @@ int main(int argc, char* argv[]) {
 		{
 			for (int i = 0; i < 100; i++) 
 			{
-				//particles.push_back(Particle{ mousePosition, { randomf(-300, 300), randomf(-300, 300)} });
+				particles.push_back(Particle{ mousePosition, { randomf(-300, 300), randomf(-300, 300)} });
 			}
 		}
 
-		
+		for (Particle& particle : particles) {
+			particle.Update(time.GetDeltaTime());
+			if (particle.position.x > 800) particle.position.x = 0;
+			if (particle.position.x < 0) particle.position.x = 800;
+			if (particle.position.y > 600) particle.position.x = 0;
+			if (particle.position.y < 0) particle.position.x = 600;
+		}
 
 		
 		if (input.getMouseButtonDown(0) && !input.getPreviousMouseButtonDown(0)) {
@@ -68,11 +74,11 @@ int main(int argc, char* argv[]) {
 		renderer.SetColor(0, 0, 0, 0);
 		renderer.BeginFrame();
 
-		for (int i = 0; points.size() > 1 && i < points.size() - 1; i++) {
-			renderer.SetColor(255, 255, 255, 0);
-			renderer.Drawpoint(points[i].x, points[i].y);
-			renderer.DrawLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+		renderer.SetColor(255, 255, 255, 0);
+		for (Particle particle : particles) {
+			particle.Draw(renderer);
 		}
+
 		
 		renderer.EndFrame();
 
