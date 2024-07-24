@@ -1,21 +1,14 @@
-#include "Renderer.h"
-#include "Vector2.h"
-#include "Input.h"
-#include "ETime.h"
-#include "Random.h"
-#include "Particles.h"
+#include "Engine.h"
 
 #include <cstdlib>
 #include <iostream>
-#include <SDL.h>
 #include <vector>
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	
-	Renderer renderer;
-	renderer.Initialize();
-	renderer.CreateWindow("Game Window", 800, 600);
+
+	g_engine.Initialize();
+
 
 	Input input;
 	input.Initialize();
@@ -24,36 +17,90 @@ int main(int argc, char* argv[]) {
 
 	vector<Particle> particles;
 
+	float offset = 0;
+
+	Font* font = new Font();
+	font->Load("ArcadeClassic.ttf", 20);
+
+	Text* text = new Text(font);
+
+	// create audio system
+	FMOD::System* audio;
+	FMOD::System_Create(&audio);
+
+	
+
+	void* extradriverdata = nullptr;
+	audio->init(32, FMOD_INIT_NORMAL, extradriverdata);
+
+	FMOD::Sound* sound = nullptr;
+	audio->createSound("test.wav", FMOD_DEFAULT, 0, &sound);
+
+	audio->playSound(sound, 0, false, nullptr);
+
+	std::vector<FMOD::Sound*> sounds;
+	
+	audio->createSound("bass.wav", FMOD_DEFAULT, 0, &sound);
+	sounds.push_back(sound);
+
+	audio->createSound("snare.wav", FMOD_DEFAULT, 0, &sound);
+	sounds.push_back(sound);
+
+	audio->createSound("open-hat.wav", FMOD_DEFAULT, 0, &sound);
+	sounds.push_back(sound);
+
 
 	bool quit = false;
 	vector<Vector2> points;
 	while (!quit)
 	{
+
 		time.Tick();
-		
-	
+		g_engine.Update();
+		audio->update();
+
+
+
 		input.Update();
 		if (input.GetKeyDown(SDL_SCANCODE_ESCAPE)) {
 			quit = true;
 		}
 
 		Vector2 mousePosition = input.GetMousePosition();
-		if (input.getMouseButtonDown(0)) 
+		if (input.getMouseButtonDown(0))
 		{
-			for (int i = 0; i < 100; i++) 
+			for (int i = 0; i < 100; i++)
 			{
-				particles.push_back(Particle{ mousePosition, { randomf(-300, 300), randomf(-300, 300)} });
+				particles.push_back(Particle{ mousePosition, RandomUnitOnCircle() * (10, 30) });
 			}
 		}
 
+
+
 		for (Particle& particle : particles) {
 			particle.Update(time.GetDeltaTime());
-			if (particle.position.x > 800) particle.position.x = 0;
-			if (particle.position.x < 0) particle.position.x = 800;
-			if (particle.position.y > 600) particle.position.x = 0;
-			if (particle.position.y < 0) particle.position.x = 600;
+			if (particle.m_position.x > 800) particle.m_position.x = 0;
+			if (particle.m_position.x < 0) particle.m_position.x = 800;
+			if (particle.m_position.y > 600) particle.m_position.y = 0;
+			if (particle.m_position.y < 0) particle.m_position.y = 600;
 		}
 
+
+		if (input.GetKeyDown(SDL_SCANCODE_Q) && !input.GetPrevKeyDown(SDL_SCANCODE_Q))
+		{
+			audio->playSound(sounds[0], 0, false, nullptr);
+		};
+
+		if (input.GetKeyDown(SDL_SCANCODE_W) && !input.GetPrevKeyDown(SDL_SCANCODE_W))
+		{
+			audio->playSound(sounds[1], 0, false, nullptr);
+		};
+
+		if (input.GetKeyDown(SDL_SCANCODE_E) && !input.GetPrevKeyDown(SDL_SCANCODE_E))
+		{
+			audio->playSound(sounds[2], 0, false, nullptr);
+		};
+	
 		
 		if (input.getMouseButtonDown(0) && !input.getPreviousMouseButtonDown(0)) {
 			cout << "Mouse Pressed\n";
@@ -70,17 +117,28 @@ int main(int argc, char* argv[]) {
 		}
 
 		
+		g_engine.GetRenderer().SetColor(0, 0, 0, 0);
+		g_engine.GetRenderer().BeginFrame();
+		
+		
 
-		renderer.SetColor(0, 0, 0, 0);
-		renderer.BeginFrame();
+		float radius = 60;
+		offset += (90 * time.GetDeltaTime());
+		for (float angle = 0; angle < 360; angle += 360 / 30) {
+			float x = Math::Cos(Math::DegToRad(angle * offset)) * Math::Sin(offset + angle) * 0.1f * radius;
+			float y = Math::Sin(Math::DegToRad(angle * offset)) * Math::Sin(offset + angle) * 0.1f * radius;
 
-		renderer.SetColor(255, 255, 255, 0);
-		for (Particle particle : particles) {
-			particle.Draw(renderer);
+			g_engine.GetRenderer().DrawRect(400 + x, 300 + y, 4.0f, 4.0f);
 		}
 
+		for (Particle particle : particles) {
+			particle.Draw(g_engine.GetRenderer());
+		}
 		
-		renderer.EndFrame();
+		text->Create(g_engine.GetRenderer(), "Hello World", Color{ 1, 1, 1, 1 });
+		text->Draw(g_engine.GetRenderer(), 40, 40);
+		
+		g_engine.GetRenderer().EndFrame();
 
 	}
 	return 0;

@@ -1,26 +1,41 @@
 #include "Renderer.h"
 #include <iostream>
 #include <SDL.h>
-#include <string>
-using namespace std;
 
 bool Renderer::Initialize()
 {
+	// initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		std::cerr << "Error initializing SDL: " << SDL_GetError() << std::endl;
 		return false;
 	}
+
+	// initialize TTF SDL
+	if (TTF_Init() < 0)
+	{
+		std::cerr << "Error initializing SDL TTF: " << SDL_GetError() << std::endl;
+		return false;
+	}
+
 	return true;
 }
 
 void Renderer::Shutdown()
 {
+	SDL_DestroyRenderer(m_renderer);
+	SDL_DestroyWindow(m_window);
+	TTF_Quit();
 }
 
-bool Renderer::CreateWindow(string title, int width, int height)
+bool Renderer::CreateWindow(std::string title, int width, int height)
 {
-		m_window = SDL_CreateWindow(title.c_str(),
+	m_width = width;
+	m_height = height;
+
+	// create window
+	// returns pointer to window if successful or nullptr if failed
+	m_window = SDL_CreateWindow(title.c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		width, height,
 		SDL_WINDOW_SHOWN);
@@ -30,7 +45,9 @@ bool Renderer::CreateWindow(string title, int width, int height)
 		SDL_Quit();
 		return false;
 	}
-	m_renderer = SDL_CreateRenderer(m_window, -1, 0);
+
+	// create renderer
+	m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	return true;
 }
 
@@ -56,15 +73,27 @@ void Renderer::DrawLine(int x1, int y1, int x2, int y2)
 
 void Renderer::DrawLine(float x1, float y1, float x2, float y2)
 {
-	SDL_RenderDrawLine(m_renderer, x1, y1, x2, y2);
+	SDL_RenderDrawLineF(m_renderer, x1, y1, x2, y2);
 }
 
-void Renderer::Drawpoint(int x1, int y1)
+void Renderer::DrawPoint(int x, int y)
 {
-	SDL_RenderDrawPoint(m_renderer, x1, y1);
+	SDL_RenderDrawPoint(m_renderer, x, y);
 }
 
-void Renderer::Drawpoint(float x1, float y1)
+void Renderer::DrawPoint(float x, float y)
 {
-	SDL_RenderDrawPoint(m_renderer, x1, y1);
+	SDL_RenderDrawPointF(m_renderer, x, y);
+}
+
+void Renderer::DrawRect(int x, int y, int w, int h)
+{
+	SDL_Rect rect{ x - w / 2, y - h / 2, w, h };
+	SDL_RenderFillRect(m_renderer, &rect);
+}
+
+void Renderer::DrawRect(float x, float y, float w, float h)
+{
+	SDL_FRect rect{ x - w / 2, y - h / 2, w, h };
+	SDL_RenderFillRectF(m_renderer, &rect);
 }
