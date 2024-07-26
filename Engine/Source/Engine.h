@@ -9,11 +9,10 @@
 #include "Particles.h"
 #include "Model.h"
 #include "Transform.h"
-#include "Font.h"
-#include "Text.h"
 
 #include <SDL.h>
 #include <fmod.hpp>
+#include "ParticleSystem.h"
 
 class Engine
 {
@@ -30,14 +29,18 @@ public:
 	Input& GetInput() { return *m_input; }
 	Audio& GetAudio() { return *m_audio; }
 	Time& GetTime() { return *m_time; }
+	ParticleSystem& GetPS() { return *m_ps; }
+
 	bool IsQuit() { return quit; }
 
 private:
 	bool quit = false;
-	Time* m_time{ nullptr };
-	Renderer* m_renderer{ nullptr };
-	Input* m_input{ nullptr };
-	Audio* m_audio{ nullptr };
+
+	std::unique_ptr<ParticleSystem> m_ps;
+	std::unique_ptr<Time> m_time;
+	std::unique_ptr<Renderer> m_renderer;
+	std::unique_ptr<Input> m_input;
+	std::unique_ptr<Audio> m_audio;
 
 };
 

@@ -1,5 +1,7 @@
 #include "Actor.h"
 #include "Model.h"
+#include "Engine.h"
+
 
 void Actor::Update(float dt)
 {
@@ -12,8 +14,8 @@ void Actor::Update(float dt)
 		}
 	}
 
-	m_transform.position + (m_velocity * dt);
-	m_velocity * 1.0f / (1.0f + m_damping * dt);
+	m_transform.position += (m_velocity * dt);
+	m_velocity *= 1.0f / (1.0f + m_damping * dt);
 }
 
 void Actor::Draw(Renderer& renderer)

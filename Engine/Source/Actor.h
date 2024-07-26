@@ -1,6 +1,7 @@
 #pragma once
 #include "Transform.h"
 #include "Model.h"
+#include "Scene.h"
 
 #include <string>
 
@@ -25,11 +26,11 @@ public:
 	void SetTag(const std::string& tag) { m_tag = tag; }
 	const std::string& GetTag() { return m_tag; }
 
-	friend class Scene;
 
 	virtual void OnCollision(Actor* actor) = 0;
 	float GetRadius() { return (m_model) ? m_model->GetRadius() * m_transform.scale : 0; }
 
+	friend class Scene;
 
 protected:
 	std::string m_tag;

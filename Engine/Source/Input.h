@@ -19,8 +19,8 @@ public:
 
 
 	Vector2 GetMousePosition() { return m_mousePosition; }
-	bool getMouseButtonDown(uint8_t button) { return m_mouseButtonStates[button]; }
-	bool getPreviousMouseButtonDown(uint8_t button) { return m_prevMouseButtonStates[button]; }
+	bool GetMouseButtonDown(uint8_t button) { return m_mouseButtonStates[button]; }
+	bool GetPreviousMouseButtonDown(uint8_t button) { return m_prevMouseButtonStates[button]; }
 
 private:
 	vector<uint8_t> k_keyboardState;

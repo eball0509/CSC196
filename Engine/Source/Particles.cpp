@@ -1,13 +1,30 @@
 #include "Particles.h"
 
+void Particle::Initialize(const Data& data)
+{
+	isActive = true;
+	position = data.position;
+	velocity = data.velocity;
+	lifespan = data.lifespan;
+	r = data.r;
+	g = data.g;
+	b = data.b;
+	a = data.a;
+}
+
 void Particle::Update(float dt)
 {
-	if (m_lifespan != 0) m_lifespan -= dt;
-	m_position = m_position + (m_velocity * dt);
+	if (lifespan != 0.0f) lifespan -= dt;
+	isActive = (lifespan > 0);
+
+	position = position + (velocity * dt);
 }
 
 void Particle::Draw(Renderer& renderer)
 {
-
-	if (m_lifespan > 0) renderer.DrawRect(m_position.x, m_position.y, 4.0f, 4.0f);
+	if (lifespan >= 0)
+	{
+		renderer.SetColor(r, g, b, a);
+		renderer.DrawRect(position.x, position.y, 2.0f, 2.0f);
+	}
 }
